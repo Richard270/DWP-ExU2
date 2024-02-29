@@ -9,6 +9,7 @@
   "dependencies": {
     "bootstrap": "^5.3.3",
     "bootstrap-vue": "^2.23.1",
+    "boxicons": "^2.1.4",
     "vue": "^2.7.16",
     "vue-carousel": "^0.18.0",
     "vue-router": "^2.8.1",

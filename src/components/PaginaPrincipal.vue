@@ -1,4 +1,10 @@
 <script>
+ export default {
+      data:() => ({
+        active: 0
+      })
+    }
+    
 </script>
 
 <template>
@@ -24,8 +30,18 @@
     </b-row>
     <div class="cuerpo">
         <b-row>
-            <b-col cols="6" align-self="center">cols="6"</b-col>
-            <b-col cols="6" align-self="center">cols="6"</b-col>
+            <b-col cols="9" align-self="center">Libros</b-col>
+            <b-col cols="3" align-self="center">
+                <b-button class="mx-2" variant="dark" size="lg">
+                <b-icon icon="plus-lg" aria-hidden="true"></b-icon> Añadir
+            </b-button>
+            <b-button class="mx-2" variant="dark" size="lg">
+                <b-icon icon="pencil-square" aria-hidden="true"></b-icon> Editar
+            </b-button>
+            <b-button class="mx-2" variant="dark" size="lg">
+                <b-icon icon="trash" aria-hidden="true"></b-icon> Eliminar
+            </b-button>
+            </b-col>
         </b-row>
     </div>
   </b-container.fluid>
