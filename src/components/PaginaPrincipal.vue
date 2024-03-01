@@ -7,6 +7,15 @@
       filter: 'all',
       i: 0,
       row: null,
+      activeBook: null,
+      bookToUpdate: null,
+      showUpdateBookModal: false,
+      showAddBookModal: false,
+      book: {
+        name: '',
+        author: '',
+        publicationDate: null,
+      },
     };
     },
     mounted() {
@@ -18,7 +27,6 @@
       const data = await response.json();
       this.books = data;
       this.filteredBooks = this.books;
-      this.generateRows();
     },
     filterBooks(filter) {
       this.filter = filter;
@@ -69,6 +77,101 @@
 
       return card;
     },
+    onDrag(book) {
+      this.activeBook = book; 
+    },
+    allowDrop(event) {
+        event.preventDefault();
+        if (event.target.classList.contains('dropzone')) {
+            event.dataTransfer.dropEffect = 'move';
+        } else {
+            event.dataTransfer.dropEffect = 'none';
+        }
+    },
+    dropBook(book, event) {
+        event.preventDefault();
+        if (event.target.classList.contains('dropzone')) {
+            this.showUpdateBookModal = true; 
+            this.bookToUpdate = book;
+        } else {
+            this.deleteBook(book);
+        }
+    },
+    async updateBook() {
+  try {
+    const response = await fetch('/' + this.bookToUpdate.id, {
+      method: 'PUT',
+      body: JSON.stringify(this.bookToUpdate),
+    });
+    if (response.ok) {
+      const updatedBook = await response.json();
+      this.books = this.books.map(book => book.id === updatedBook.id ? updatedBook : book);
+      this.filteredBooks = this.filteredBooks.map(book => book.id === updatedBook.id ? updatedBook : book);
+      this.$bvToast.toast('Libro actualizado exitosamente', {
+        type: 'success',
+      });
+      this.closeUpdateModal();
+    } else {
+      this.$bvToast.toast('Error al actualizar el libro', {
+        type: 'danger',
+      });
+    }
+  } catch (error) {
+    console.error('Error updating book:', error);
+    this.$bvToast.toast('Error de conexión', {
+      type: 'danger',
+    });
+  }
+},
+
+async deleteBook(book) {
+  try {
+    const response = await fetch('/' + book.id, { method: 'DELETE' });
+    if (response.ok) {
+      this.books = this.books.filter(b => b.id !== book.id);
+      this.filteredBooks = this.filteredBooks.filter(b => b.id !== book.id);
+      this.$bvToast.toast('Libro eliminado exitosamente', {
+        type: 'success',
+      });
+    } else {
+      this.$bvToast.toast('Error al eliminar el libro', {
+        type: 'danger',
+      });
+    }
+  } catch (error) {
+    console.error('Error deleting book:', error);
+    this.$bvToast.toast('Error de conexión', {
+      type: 'danger',
+    });
+  }
+},
+onSubmit(evt) {
+      evt.preventDefault();
+      axios.post('/package.json', this.book)
+        .then(() => {
+          this.showAddBookModal = false;
+          this.$bvToast.show('Libro agregado exitosamente');
+        })
+        .catch(error => {
+          this.$bvToast.show('Error al agregar el libro', {
+            type: 'danger',
+          });
+        });
+        
+      this.book = {
+        name: '',
+        author: '',
+        publicationDate: null,
+      };
+    },
+    openCreateModal() {
+        this.bookToCreate = {
+            title: '',
+            author: '',
+        };
+    this.$bvModal.show('createBookModal');
+    }
+
   },
   refs: {
     listGroup: 'listGroup',
@@ -119,17 +222,67 @@
                 </b-list-group>
             </b-col>
             <b-col cols="3" align-self="center">
-                <b-button class="mx-2" variant="dark" size="lg">
+                <b-button class="mx-2" variant="dark" size="lg" @click="openCreateModal">
                 <b-icon icon="plus-lg" aria-hidden="true"></b-icon> Añadir
             </b-button>
-            <b-button class="mx-2" variant="dark" size="lg">
-                <b-icon icon="pencil-square" aria-hidden="true"></b-icon> Editar
+            <b-button class="mx-2" variant="dark" size="lg" @click="openUpdateModal(book)">
+                <b-icon icon="pencil-square" aria-hidden="true"></b-icon> Actualizar
             </b-button>
-            <b-button class="mx-2" variant="dark" size="lg">
+            <b-button class="mx-2" variant="dark" size="lg" @click="deleteBook(book)">
                 <b-icon icon="trash" aria-hidden="true"></b-icon> Eliminar
             </b-button>
             </b-col>
         </b-row>
+        <div id="updateBookModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Actualizar libro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="updateBook">
+                    <div class="form-group">
+                        <label for="title">Título</label>
+                        <input type="text" v-model="bookToUpdate.title" id="title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Autor</label>
+                        <input type="text" v-model="bookToUpdate.author" id="author" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Guardar</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
+        <div id="createBookModal" class="modal fade" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Crear nuevo libro</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form @submit.prevent="createBook">
+                    <div class="form-group">
+                        <label for="title">Título</label>
+                        <input type="text" v-model="bookToCreate.title" id="title" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="author">Autor</label>
+                        <input type="text" v-model="bookToCreate.author" id="author" class="form-control">
+                    </div>
+                    <button type="submit" class="btn btn-primary">Crear</button>
+                    </form>
+                </div>
+                </div>
+            </div>
+        </div>
     </div>
   </b-container.fluid>
 </template>
