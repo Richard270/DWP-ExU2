@@ -11,12 +11,24 @@
     <b-container.fluid class="bv-example-row mb-3 ">
     <b-row>
       <b-col cols="12" md="12">
-        <carousel :per-page="1" :navigate-to="someLocalProperty" :mouse-drag="false">
+        <carousel :per-page="4" :auto-play="true" :pause="false" :interval="3000">
                 <slide>
-                Slide 1 Content
+                    <img src="./img/portada.jpg" alt="Book cover">
                 </slide>
                 <slide>
-                Slide 2 Content
+                    <img src="./img/portada.jpg" alt="Book cover">
+                </slide>
+                <slide>
+                    <img src="./img/portada.jpg" alt="Book cover">
+                </slide>
+                <slide>
+                    <img src="./img/portada.jpg" alt="Book cover">
+                </slide>
+                <slide>
+                    <img src="./img/portada.jpg" alt="Book cover">
+                </slide>
+                <slide>
+                    <img src="./img/portada.jpg" alt="Book cover">
                 </slide>
             </carousel>
       </b-col>
@@ -30,7 +42,15 @@
     </b-row>
     <div class="cuerpo">
         <b-row>
-            <b-col cols="9" align-self="center">Libros</b-col>
+            <b-col cols="9" align-self="center">Libros
+                <b-list-group>
+                    <b-list-group-item>
+                    <img src="./img/portada.jpg" alt="Book cover">
+                    <h5 class="mb-0">Título del libro</h5>
+                    <p class="mb-0">Autor del libro</p>
+                    </b-list-group-item>
+                </b-list-group>
+            </b-col>
             <b-col cols="3" align-self="center">
                 <b-button class="mx-2" variant="dark" size="lg">
                 <b-icon icon="plus-lg" aria-hidden="true"></b-icon> Añadir
@@ -55,5 +75,17 @@
 }
 .cuerpo{
     margin-top: 15px;
+}
+#book-carousel {
+  width: 100%;
+  height: 300px;
+}
+#book-carousel img {
+  width: 100%;
+  height: 100%;
+}
+img {
+  width: 200px;
+  height: 250px;
 }
 </style>
